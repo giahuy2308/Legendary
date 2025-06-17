@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") #
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = ["localhost"] #
+ALLOWED_HOSTS = ["localhost","127.0.0.1"] #
 
 
 # Application definition
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework", #
     "corsheaders", #
+    "olympia",
 ]
 
 MIDDLEWARE = [
@@ -97,22 +98,23 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME","postgres"),
-        "USER": os.getenv("DB_USER","postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD","postgres"),
-        "HOST": "db",  # set in docker-compose.yml
-        "PORT": 5432,  # default postgres port
-    }
-} #
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.getenv("DB_NAME","postgres"),
+#         "USER": os.getenv("DB_USER","postgres"),
+#         "PASSWORD": os.getenv("DB_PASSWORD","postgres"),
+#         "HOST": "db",  # set in docker-compose.yml
+#         "PORT": 5432,  # default postgres port
 #     }
-# }
+# } #
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
@@ -150,6 +152,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = 'resources/'
+MEDIA_ROOT = BASE_DIR / "resources"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
