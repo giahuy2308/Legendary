@@ -30,10 +30,10 @@ class Exam(models.Model):
         get_latest_by = 'title'
     
     def __str__(self):
-        return self.title
+        return f"{self.title} "
 
 class ExamRecord(models.Model):
-    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=255,default="")
     current_record = models.BooleanField(default=True)
     played_at = models.DateTimeField(auto_now_add=True)
@@ -44,7 +44,7 @@ class ExamRecord(models.Model):
     def __str__(self):
         return self.title
 
-    # Uncomplete/ ReWrite in signals 
+    # Uncompleted/ ReWrite in signals 
     def save(self,*args,**kwargs):
         self.title = f'"{self.exam.title}" record @ {self.played_at}' 
         return super().save(*args,**kwargs)
@@ -63,7 +63,7 @@ class PlayerRecord(models.Model):
 
 # Tự động xoá file media lưu trong resources khi xoá hoặc update media instance
 class MediaResource(models.Model):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField()
     question = GenericForeignKey('content_type', 'object_id')
     
@@ -93,11 +93,9 @@ class AbstractQuestion(models.Model):
     class Meta:
         abstract = True
         get_latest_by = ["exam","-target_player_no","-question_no"]
-    
+
     def __str__(self):
         return f"{self.target_player_no} | {self.question_no} | {self.question_text} | {self.question_data_type} | {self.exam}"
-    
-
 
 class AbstractRecord(models.Model):
     record = models.ForeignKey(ExamRecord, on_delete=models.CASCADE)
@@ -106,8 +104,8 @@ class AbstractRecord(models.Model):
     is_correct = models.BooleanField(default=False)
     question_value = models.PositiveIntegerField(default=10)
     question_text = models.TextField()
-    answer_text = models.TextField()
-    media = GenericRelation(MediaResource)
+    answer_text = models.TextField(null=True)
+    media = models.ManyToManyField(MediaResource)
 
     class Meta:
         abstract = True
