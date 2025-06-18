@@ -1,5 +1,11 @@
-.dockerignore
 venv/
 db.sqlite3
 __pycache__/
-media/
+resources/Image/*
+resources/Audio/*
+resources/Video/*
+resources/Exam/*
+!resources/Image/.gitkeep
+!resources/Audio/.gitkeep
+!resources/Video/.gitkeep
+!resources/Exam/.gitkeep
