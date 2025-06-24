@@ -15,7 +15,7 @@ class KDQuestion(AbstractQuestion):
     pass
 
 class KDRecord(AbstractRecord):
-    player = models.ForeignKey(PlayerRecord,related_name="kd_player_record", on_delete=models.RESTRICT , blank=True,null=True)
+    player = models.ForeignKey(PlayerRecord,related_name="kd_player_record", on_delete=models.RESTRICT, null=True)
     player_steal = models.ForeignKey(PlayerRecord, related_name="kd_steal_record", on_delete=models.RESTRICT , blank=True, null=True)
     question = models.ForeignKey(KDQuestion, on_delete=models.SET_NULL, null=True)
     

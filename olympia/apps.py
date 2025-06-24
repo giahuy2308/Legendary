@@ -5,5 +5,5 @@ class OlympiaConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'olympia'
 
-    # def ready(self):
-    #     return super().ready()
+    def ready(self):    
+        import olympia.signals

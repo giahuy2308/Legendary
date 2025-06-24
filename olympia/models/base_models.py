@@ -1,6 +1,11 @@
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
+from ..services.signal_services import referenced_media
+
+
+
 
 global QUESTION_DATA_TYPE_CHOICES
 QUESTION_DATA_TYPE_CHOICES = [
@@ -30,7 +35,7 @@ class Exam(models.Model):
         get_latest_by = 'title'
     
     def __str__(self):
-        return f"{self.title} "
+        return f"{self.title}"
 
 class ExamRecord(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True)
@@ -39,15 +44,10 @@ class ExamRecord(models.Model):
     played_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        get_latest_by = ["exam","played_at"]
+        get_latest_by = ["current_record","exam","played_at"]
 
     def __str__(self):
         return self.title
-
-    # Uncompleted/ ReWrite in signals 
-    def save(self,*args,**kwargs):
-        self.title = f'"{self.exam.title}" record @ {self.played_at}' 
-        return super().save(*args,**kwargs)
     
 class PlayerRecord(models.Model):
     no = models.PositiveIntegerField(default=0)
@@ -55,13 +55,12 @@ class PlayerRecord(models.Model):
     display_name = models.CharField(max_length=255,default="")
     score = models.PositiveIntegerField(default=0)
 
-    def created():
-        pass
+    class Meta:
+        get_latest_by = ['record','no']
 
     def __str__(self):
-        return f"{self.no} | {self.display_name}" 
-
-# Tự động xoá file media lưu trong resources khi xoá hoặc update media instance
+        return f"{self.no} | {self.display_name} | {self.record.title}" 
+    
 class MediaResource(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField()
@@ -78,13 +77,13 @@ class MediaResource(models.Model):
         get_latest_by = ["question","media_type"]
 
     def __str__(self):
-        return f"{self.question.exam} | {self.resource}"
+        return f"{self.question} | {self.resource}"
 
 class AbstractQuestion(models.Model):
     question_no = models.PositiveBigIntegerField(default=0)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     question_text = models.TextField()
-    answer = models.TextField(blank=True,null=True)
+    answer_text = models.TextField(blank=True, null=True)
     question_data_type = models.CharField(max_length=10,choices=QUESTION_DATA_TYPE_CHOICES, default="Text")
     question_value = models.PositiveIntegerField(default=10)
     target_player_no = models.PositiveIntegerField(default=1)
@@ -100,25 +99,16 @@ class AbstractQuestion(models.Model):
 class AbstractRecord(models.Model):
     record = models.ForeignKey(ExamRecord, on_delete=models.CASCADE)
     question_no = models.PositiveIntegerField(default=0)
-    question_data_type = models.CharField(max_length=10, choices=QUESTION_DATA_TYPE_CHOICES, default="Text")
+    question_data_type = models.CharField(max_length=10, choices=QUESTION_DATA_TYPE_CHOICES, default="Text",null=True)
     is_correct = models.BooleanField(default=False)
     question_value = models.PositiveIntegerField(default=10)
-    question_text = models.TextField()
+    question_text = models.TextField(null=True)
     answer_text = models.TextField(null=True)
     media = models.ManyToManyField(MediaResource)
 
     class Meta:
         abstract = True
-        get_latest_by = ["exam","record","question","question_no"]
-
-    def save(self, *args, **kwargs):
-        self.question_no = self.question.question_no
-        self.question_text = self.question.question_text
-        self.question_value = self.question.question_value
-        self.question_data_type = self.question.question_data_type
-        self.answer_text = self.question.answer
-        
-        return super().save(*args, **kwargs)
+        get_latest_by = ["record","question","-question_no"]
     
     def __str__(self):
-        return f"{self.record} | {self.question_no} | {self.question_text}"
+        return f"{self.question_no} | {self.question_text} | {self.record} "

@@ -16,8 +16,8 @@ class VDQuestion(AbstractQuestion):
     pass
 
 class VDRecord(AbstractRecord):
-    player = models.ForeignKey(PlayerRecord, related_name="vd_player_record", on_delete=models.RESTRICT )
-    player_steal = models.ForeignKey(PlayerRecord, related_name="vd_steal_record", on_delete=models.RESTRICT )
+    player = models.ForeignKey(PlayerRecord, related_name="vd_player_record", on_delete=models.RESTRICT ,null=True)
+    player_steal = models.ForeignKey(PlayerRecord, related_name="vd_steal_record", on_delete=models.RESTRICT,blank = True, null=True)
     question = models.ForeignKey(VDQuestion, on_delete=models.SET_NULL, null=True)
     picked_question = models.CharField(max_length=6, default="0,0,0,0,0,0")
     nshv = models.CharField(max_length=3,default="0,0,0")

@@ -1,8 +1,9 @@
-from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+
 import zipfile
 import os
-from django.conf import settings
 
 def extract_zip(zip_file):
     zip_temp_path = default_storage.save("temp_upload.zip", ContentFile(zip_file.read()))

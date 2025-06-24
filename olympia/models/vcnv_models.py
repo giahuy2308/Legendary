@@ -24,8 +24,8 @@ class VCNVQuestion(AbstractQuestion):
 
 
 class VCNVRecord(AbstractRecord):
-    player_answer = models.JSONField()
+    player_answer = models.JSONField(null=True)
     question = models.ForeignKey(VCNVQuestion, on_delete=models.SET_NULL, null=True)
-    question_type = models.CharField(max_length=10,choices=QUESTION_TYPE_CHOICES, default="HN")
+    question_type = models.CharField(max_length=10,choices=QUESTION_TYPE_CHOICES, default="HN",null=True)
 
 
